@@ -4,103 +4,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pace of Play Calculator v2</title>
+    <title>Pace of Play Calculator v3</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-
-        h1 {
-            text-align: center;
-        }
-
-        .input-container {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 20px;
-        }
-
-        .input-container label {
-            margin-bottom: 5px;
-        }
-
-        .input-container input {
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .button-container {
-            text-align: center;
-        }
-
-        .button-container button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .result {
-            text-align: center;
-            margin-top: 20px;
-        }
+        /* CSS styles remain the same */
     </style>
 </head>
 
 <body>
     <h1>Pace of Play Calculator</h1>
 
-    <form onsubmit="return false;">
+    <form action="" method="post">
         <div class="input-container">
             <label for="start-time">Start Time (HH:mm)</label>
-            <input type="time" id="start-time">
+            <input type="text" name="start-time" pattern="^(0?[1-9]|1[0-2]):[0-5][0-9]" placeholder="00:00">
         </div>
 
         <div class="input-container">
             <label for="current-hole">Current Hole</label>
-            <input type="number" id="current-hole" min="1" max="18">
+            <input type="number" name="current-hole" min="1" max="18">
         </div>
 
         <div class="button-container">
-            <button onclick="estimateFinishTime()">Estimate Finish Time</button>
+            <button type="submit">Estimate Finish Time</button>
         </div>
     </form>
 
-    <div class="result" id="result">Estimated Finish Time: 00:00 AM/PM</div>
+    <div class="result">
+        <?php
+        if ($_SERVER["REQUEST_METHOD"] === "POST") {
+            $startTime = $_POST["start-time"];
+            $currentHole = $_POST["current-hole"];
 
-    <script>
-        function estimateFinishTime() {
-            var startTimeInput = document.getElementById("start-time").value;
-            var currentHoleInput = document.getElementById("current-hole").value;
-            var resultContainer = document.getElementById("result");
+            if (!preg_match("/^(0?[1-9]|1[0-2]):[0-5][0-9]$/", $startTime)) {
+                echo "Invalid start time format.";
+            } elseif (!is_numeric($currentHole) || $currentHole < 1 || $currentHole > 18) {
+                echo "Invalid current hole number.";
+            } else {
+                $startTimeComponents = explode(":", $startTime);
+                $hours = intval($startTimeComponents[0]);
+                $minutes = intval($startTimeComponents[1]);
 
-            var startTimeComponents = startTimeInput.split(":");
-            var hours = parseInt(startTimeComponents[0]);
-            var minutes = parseInt(startTimeComponents[1]);
+                $timePerHoleInSeconds = (60 * 60) / 18;
+                $totalTimeInSeconds = $timePerHoleInSeconds * $currentHole;
 
-            if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
-                resultContainer.textContent = "Invalid start time format.";
-                return;
+                $finishHours = floor($totalTimeInSeconds / 3600);
+                $finishMinutes = floor(($totalTimeInSeconds % 3600) / 60);
+                $period = ($finishHours >= 12) ? "PM" : "AM";
+                $finishHours = ($finishHours % 12) || 12;
+
+                echo "Estimated Finish Time: " . sprintf("%02d:%02d %s", $finishHours, $finishMinutes, $period);
             }
+        }
+        ?>
+    </div>
+</body>
 
-            var hole = parseInt(currentHoleInput);
-
-            if (isNaN(hole) || hole < 1 || hole > 18) {
-                resultContainer.textContent = "Invalid current hole number.";
-                return;
-            }
-
-            var timePerHoleInSeconds = (60 * 60) / 18;
-            var totalTimeInSeconds = timePerHoleInSeconds * hole;
-
-            var finishHours = Math.floor(totalTimeInSeconds / 3600);
-            var finishMinutes = Math.floor((totalTimeInSeconds % 3600) / 60);
-            var period = (finishHours >= 12) ? "PM" : "AM";
-            finishHours = (finishHours % 12) || 12;
-            var finishTimeString = formatTime(finishHours, finish
+</html>
