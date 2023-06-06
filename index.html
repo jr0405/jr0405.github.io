@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pace of Play Calculator v1</title>
+    <title>Pace of Play Calculator v2</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -59,7 +59,7 @@
     <form onsubmit="return false;">
         <div class="input-container">
             <label for="start-time">Start Time (HH:mm)</label>
-            <input type="text" id="start-time" pattern="^(0?[1-9]|1[0-2]):[0-5][0-9]" placeholder="00:00">
+            <input type="time" id="start-time">
         </div>
 
         <div class="input-container">
@@ -72,7 +72,7 @@
         </div>
     </form>
 
-    <div class="result" id="result">Estimated Finish Time: 00:00</div>
+    <div class="result" id="result">Estimated Finish Time: 00:00 AM/PM</div>
 
     <script>
         function estimateFinishTime() {
@@ -101,8 +101,6 @@
 
             var finishHours = Math.floor(totalTimeInSeconds / 3600);
             var finishMinutes = Math.floor((totalTimeInSeconds % 3600) / 60);
-            var finishTimeString = formatTime(finishHours, finishMinutes);
-
-            resultContainer.textContent = "Estimated Finish Time: " + finishTimeString;
-        }
-
+            var period = (finishHours >= 12) ? "PM" : "AM";
+            finishHours = (finishHours % 12) || 12;
+            var finishTimeString = formatTime(finishHours, finish
