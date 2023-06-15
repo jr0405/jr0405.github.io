@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pace of Play Calculator5</title>
+    <title>Pace of Play Calculator6</title>
     <style>
         /* CSS styles remain the same */
     </style>
@@ -47,15 +47,21 @@
                 return;
             }
 
-            var startTimeComponents = startTime.split(":");
-            var hours = parseInt(startTimeComponents[0]);
-            var minutes = parseInt(startTimeComponents[1]);
+            var now = new Date();
+            var startHour = parseInt(startTime.substr(0, 2));
+            var startMinute = parseInt(startTime.substr(3, 2));
+            var startDateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), startHour, startMinute);
 
-            var timePerHoleInSeconds = (60 * 60) / 18;
-            var totalTimeInSeconds = timePerHoleInSeconds * currentHole;
+            var elapsedMilliseconds = now - startDateTime;
+            var elapsedMinutes = Math.floor(elapsedMilliseconds / 1000 / 60);
 
-            var finishHours = Math.floor(totalTimeInSeconds / 3600);
-            var finishMinutes = Math.floor((totalTimeInSeconds % 3600) / 60);
+            var timePerHole = elapsedMinutes / currentHole;
+            var estimatedRoundTime = timePerHole * 18;
+
+            var finishDateTime = new Date(startDateTime.getTime() + (estimatedRoundTime * 60000));
+            var finishHours = finishDateTime.getHours();
+            var finishMinutes = finishDateTime.getMinutes();
+
             var period = (finishHours >= 12) ? "PM" : "AM";
             finishHours = (finishHours % 12) || 12;
 
